@@ -704,8 +704,8 @@
               <label for="officeStaff">Number of Office Staff<span class="input-detail">Total headcount of office staff in materials workflow.</span></label>
               <div class="value" id="officeStaffValue"></div>
             </div>
-            <input id="officeStaff" type="range" min="5" max="80" step="5" value="10" />
-            <div class="range-meta"><span>5</span><span>80</span></div>
+            <input id="officeStaff" type="range" min="0" max="80" step="1" value="10" />
+            <div class="range-meta"><span>0</span><span>80</span></div>
           </div>
 
           <div class="control">
@@ -723,8 +723,8 @@
               <label for="staffTimeRecovered">Time Recovered From Purchasing Workflow<span class="input-detail">Recoverable time lost to manual procurement and reconciliation workflows.</span></label>
               <div class="value" id="staffTimeRecoveredValue"></div>
             </div>
-            <input id="staffTimeRecovered" type="range" min="0" max="20" step="1" value="10" />
-            <div class="range-meta"><span>0%</span><span>20%</span></div>
+            <input id="staffTimeRecovered" type="range" min="0" max="80" step="1" value="10" />
+            <div class="range-meta"><span>0%</span><span>80%</span></div>
           </div>
           <!-- OFFICE END -->
           <p class="section-label">General Assumptions</p>
@@ -737,6 +737,8 @@
             <div class="range-meta"><span>$2M</span><span>$800M</span></div>
           </div>
 
+          
+
           <p class="section-label">Future State</p>
           <div class="control">
             <div class="control-header">
@@ -744,6 +746,20 @@
               <div class="value" id="wasteReductionValue"></div>
             </div>
             <input id="wasteReduction" type="range" min="0" max="5" step="0.1" value="2.5" />
+            <div class="range-meta"><span>0%</span><span>5%</span></div>
+          </div>
+
+          <div class="control">
+            <div class="control-header">
+              <label for="materialSavings">
+                Material Cost Savings
+                <span class="input-detail">
+                  Additional savings from improved vendor pricing, bulk ordering, or reduced rush orders.
+                </span>
+              </label>
+              <div class="value" id="materialSavingsValue"></div>
+            </div>
+            <input id="materialSavings" type="range" min="0" max="5" step="0.1" value="1.0" />
             <div class="range-meta"><span>0%</span><span>5%</span></div>
           </div>
 
@@ -909,7 +925,7 @@
               <span class="explainer">Recovered Staff Value =</span>
               Number of Office Staff × Fully Loaded Office Staff Cost × Time Recovered From Purchasing Workflow.
               <span class="explainer">Material Savings =</span> 
-              Annual Material Spend × Material Waste Reduction Percent.
+              Annual Material Spend × (Material Waste Reduction % + Material Cost Savings %).
               <span class="explainer">Total Annual Gross Value =</span> 
               (Recovered Labor Value + Recovered Staff Value + Material Savings) × Adoption Rate.
               <span class="explainer">Net Annual Value =</span> 
@@ -945,6 +961,7 @@
       
       Annual_Material_Spend: document.getElementById('materialSpend'),
       Material_Waste_Reduction_Percent: document.getElementById('wasteReduction'),
+      Material_Cost_Savings_Percent: document.getElementById('materialSavings'),
       Adoption_Rate: document.getElementById('adoptionRate'),
       Annual_Platform_Cost: document.getElementById('platformCost')
     };
@@ -960,6 +977,7 @@
 
       materialSpendValue: document.getElementById('materialSpendValue'),
       wasteReductionValue: document.getElementById('wasteReductionValue'),
+      materialSavingsValue: document.getElementById('materialSavingsValue'),
       adoptionRateValue: document.getElementById('adoptionRateValue'),
       platformCostValue: document.getElementById('platformCostValue'),
 
@@ -1050,6 +1068,7 @@
 
       const Annual_Material_Spend = Number(inputs.Annual_Material_Spend.value);
       const Material_Waste_Reduction_Percent = Number(inputs.Material_Waste_Reduction_Percent.value) / 100;
+      const Material_Cost_Savings_Percent = Number(inputs.Material_Cost_Savings_Percent.value) / 100;
       const Adoption_Rate = Number(inputs.Adoption_Rate.value) / 100;
       const Annual_Platform_Cost = Number(
         inputs.Annual_Platform_Cost.value.replace(/[^0-9.-]+/g, '')
@@ -1057,7 +1076,7 @@
 
       const Recovered_Labor_Value = Number_of_Field_Electricians * Fully_Loaded_Electrician_Cost * Time_Recovered_From_Material_Handling;
       const Recovered_Staff_Value = Number_of_Staff * Fully_Loaded_Staff_Cost * Time_Recovered_From_Staff_Handling; 
-      const Material_Savings = Annual_Material_Spend * Material_Waste_Reduction_Percent;
+      const Material_Savings = Annual_Material_Spend * (Material_Waste_Reduction_Percent + Material_Cost_Savings_Percent);
       const Total_Annual_Gross_Value = (Recovered_Labor_Value + Material_Savings + Recovered_Staff_Value) * Adoption_Rate;
       const Net_Annual_Value = Total_Annual_Gross_Value - Annual_Platform_Cost;
       const Breakeven_Months = Total_Annual_Gross_Value > 0 ? (Annual_Platform_Cost / Total_Annual_Gross_Value) * 12 + 4 : Infinity;
@@ -1072,6 +1091,7 @@
         Time_Recovered_From_Staff_Handling,
         Annual_Material_Spend,
         Material_Waste_Reduction_Percent,
+        Material_Cost_Savings_Percent,
         Adoption_Rate,
         Annual_Platform_Cost,
         Recovered_Labor_Value,
@@ -1094,7 +1114,8 @@
       display.staffTimeRecoveredValue.textContent = formatPercent(model.Time_Recovered_From_Staff_Handling * 100, 0);
 
       display.materialSpendValue.textContent = formatCurrency(model.Annual_Material_Spend, 0);
-      display.wasteReductionValue.textContent = formatPercent(model.Material_Waste_Reduction_Percent * 100, 1);
+      display.wasteReductionValue.textContent = formatPercent(model.Material_Waste_Reduction_Percent * 100, 1); // old
+      display.materialSavingsValue.textContent = formatPercent(model.Material_Cost_Savings_Percent * 100, 1);
       display.adoptionRateValue.textContent = formatPercent(model.Adoption_Rate * 100, 0);
       inputs.Annual_Platform_Cost.value = Math.round(model.Annual_Platform_Cost || 0);
     }
@@ -1184,6 +1205,7 @@
       container.style.display = "block";
       input.focus();
       input.select();
+
     });
 
     document.getElementById("copyLinkBtn").addEventListener("click", async () => {
@@ -1193,6 +1215,9 @@
       await navigator.clipboard.writeText(input.value);
       btn.textContent = "Copied ✓";
       btn.style.backgroundColor = '#E0F7FA';
+
+      sendToWebhook(input.value); //collect
+      console.log(input.value);
 
       setTimeout(() => {
         btn.textContent = "Copy link";
@@ -1219,6 +1244,30 @@
     window.addEventListener("DOMContentLoaded", loadValuesFromURL);
 
     /*********** SHARE END ************/
+
+
+    function sendToWebhook(url, email = null) {
+      fetch("https://remarcable-workspace.app.n8n.cloud/webhook/e9570552-84e2-4d23-9902-fb17753cec57", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          shareUrl: url,
+          email: email,
+          timestamp: new Date().toISOString()
+        })
+      }).catch(err => console.error("Webhook error:", err));
+    }
+
+
+    document.getElementById("shareEmailForm").addEventListener("submit", function(e) {
+      const url = generateShareURL();
+      const email = document.getElementById("email").value;
+
+      sendToWebhook(url, email);
+
+    });
 
   </script>
 </body>
