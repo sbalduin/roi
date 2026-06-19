@@ -674,8 +674,8 @@
               <label for="fieldElectricians">Number of Field Electricians<span class="input-detail">Total headcount of electricians in the field.</span></label>
               <div class="value" id="fieldElectriciansValue"></div>
             </div>
-            <input id="fieldElectricians" type="range" min="10" max="1000" step="5" value="75" />
-            <div class="range-meta"><span>10</span><span>1000</span></div>
+            <input id="fieldElectricians" type="range" min="10" max="3000" step="5" value="75" />
+            <div class="range-meta"><span>10</span><span>3000</span></div>
           </div>
 
           <div class="control">
@@ -1247,7 +1247,7 @@
 
 
     function sendToWebhook(url, email = null) {
-      fetch("https://remarcable-workspace.app.n8n.cloud/webhook/e9570552-84e2-4d23-9902-fb17753cec57", {
+      fetch("https://remarcable-gtm.app.n8n.cloud/webhook/e9570552-84e2-4d23-9902-fb17753cec57", {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
